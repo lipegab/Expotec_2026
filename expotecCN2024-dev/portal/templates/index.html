@@ -253,7 +253,13 @@
                 </div>
             </div>
             <div class="col-sm-9">
+                {% if evento and evento.endereco %}
                 <div id="map" class="w-100"></div>
+                {% else %}
+                <div class="w-100 d-flex align-items-center justify-content-center bg-light text-muted" style="min-height: 400px;">
+                    Localização do evento não configurada.
+                </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -265,14 +271,21 @@
     {{ super.block }}
     <script src="{%static 'vendor/smoothscroll/smooth-scroll.min.js'%}"></script>
     <script src="{%static 'js/main.js'%}"></script>
+    {% if evento and evento.endereco %}
     <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkg4j28B11Wqwrv9v3uGvwYXT8M-VHzYw&libraries=geometry"></script>
+    {% endif %}
     <script>
         function initMap() {
+            {% if evento and evento.endereco %}
             const map = new google.maps.Map(document.getElementById('map'), {
                 zoom: 17
             });
 
-            const endereco = "{{evento.endereco}}";
+            const endereco = "{{ evento.endereco|escapejs }}".trim();
+            if (!endereco) {
+                document.getElementById('map').textContent = 'Endereço do evento não configurado.';
+                return;
+            }
             const geocoder = new google.maps.Geocoder();
 
             geocoder.geocode({ 'address': endereco }, function(results, status) {
@@ -280,17 +293,21 @@
                     const latLng = results[0].geometry.location;
                     map.setCenter(latLng);
                 } else {
-                    alert('Geocode was not successful for the following reason: ' + status);
+                    console.error('Não foi possível localizar o endereço do evento:', status);
+                    document.getElementById('map').textContent = 'Não foi possível localizar o endereço do evento.';
                 }
             });
+            {% endif %}
         }
 
         window.onload = function() {
             initMap();
-            video = $("#promo_video")[0];
-            video.addEventListener('canplaythrough', function() {
-                video.play();
-            });
+            const video = $("#promo_video")[0];
+            if (video) {
+                video.addEventListener('canplaythrough', function() {
+                    video.play();
+                });
+            }
             
             $("#carousel_noticias").carousel({
                 pause: "hover"
