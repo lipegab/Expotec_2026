@@ -13,12 +13,17 @@
 
 ## Setup do projeto
 
+Se o terminal estiver na raiz do repositório, entre na pasta do projeto antes de executar os comandos:
+```powershell
+cd .\expotecCN2024-dev
+```
+
 Para executar o projeto primeiro copie `.env.exemplo` para `.env` fazendo as alterações necessárias.
 
 Crie e ative o venv:
 ```
 python -m venv venv
-.\venv\Scrips\activate
+.\venv\Scripts\Activate.ps1
 ```
 
 Instale as dependências com:
