@@ -4,6 +4,7 @@ from unittest.mock import Mock
 from django.test import RequestFactory, SimpleTestCase
 from django.urls import reverse
 
+from .models import User
 from .views import IndexView, InscreverseView, MinhasInscricoesView
 
 
@@ -45,3 +46,23 @@ class UserEventViewsTests(SimpleTestCase):
             reverse("user:meu_perfil"),
             fetch_redirect_response=False,
         )
+
+
+class UserNamePropertyTests(SimpleTestCase):
+    def test_name_properties_handle_empty_full_name(self):
+        user = User(email="felipe@example.com", nome_completo="")
+
+        self.assertEqual(user.get_primeiro_nome, "felipe")
+        self.assertEqual(user.get_ultimo_nome, "")
+
+    def test_name_properties_handle_whitespace_only_full_name(self):
+        user = User(email="felipe@example.com", nome_completo="   ")
+
+        self.assertEqual(user.get_primeiro_nome, "felipe")
+        self.assertEqual(user.get_ultimo_nome, "")
+
+    def test_name_properties_use_first_and_last_names(self):
+        user = User(email="felipe@example.com", nome_completo="Felipe Gabriel Silva")
+
+        self.assertEqual(user.get_primeiro_nome, "Felipe")
+        self.assertEqual(user.get_ultimo_nome, "Silva")
