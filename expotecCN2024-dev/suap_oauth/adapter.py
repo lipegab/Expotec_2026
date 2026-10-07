@@ -1,9 +1,45 @@
+import logging
+import traceback
+from urllib.parse import urlsplit
+
 from allauth.socialaccount.adapter import DefaultSocialAccountAdapter
 from allauth.account.utils import user_email, user_field
 
 
+logger = logging.getLogger(__name__)
+
+
 class SuapAdapter(DefaultSocialAccountAdapter):
-    
+    def on_authentication_error(
+        self,
+        request,
+        provider,
+        error=None,
+        exception=None,
+        extra_context=None,
+    ):
+        if provider.id == "suap" and exception is not None:
+            response = getattr(exception, "response", None)
+            status_code = getattr(response, "status_code", "unknown")
+            endpoint = getattr(response, "url", None) or getattr(
+                getattr(response, "request", None), "url", ""
+            )
+            endpoint_path = urlsplit(endpoint).path or "unknown endpoint"
+            logger.error(
+                "SUAP OAuth callback failed (%s; HTTP %s at %s)\n%s",
+                type(exception).__name__,
+                status_code,
+                endpoint_path,
+                "".join(traceback.format_tb(exception.__traceback__)),
+            )
+        return super().on_authentication_error(
+            request,
+            provider,
+            error=error,
+            exception=exception,
+            extra_context=extra_context,
+        )
+
     def populate_user(self, request, sociallogin, data):
         """
         Hook that can be used to further populate the user instance.

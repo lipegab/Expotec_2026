@@ -61,6 +61,8 @@ class IndexView(DetailView):
         return self.request.evento
 
     def get(self, request, *args, **kwargs):
+        if request.evento is None:
+            return redirect('user:meu_perfil')
         if not(request.evento.inscricoes.filter(usuario = request.user).exists()):
             return redirect('user:minhas_inscricoes')
         else:
@@ -73,6 +75,8 @@ class InscreverseView(CreateView):
     template_name ="inscricao_evento.html"
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any):
+        if request.evento is None:
+            return redirect('user:meu_perfil')
         if request.evento.inscricoes.filter(usuario = request.user).exists():
             return redirect('user:minhas_inscricoes')
         return super().get(request, *args, **kwargs)
@@ -717,6 +721,8 @@ class MinhasInscricoesView(TableListView):
     filterset_class = InscricaoAtividadeFilter
 
     def get(self, request: HttpRequest, *args: Any, **kwargs: Any):
+        if request.evento is None:
+            return redirect('user:meu_perfil')
         if not(request.evento.inscricoes.filter(usuario = request.user).exists()):
             return redirect('user:inscreverse')
         return super().get(request, *args, **kwargs)

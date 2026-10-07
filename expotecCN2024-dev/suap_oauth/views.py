@@ -22,7 +22,7 @@ class SuapOAuth2Adapter(OAuth2Adapter):
 
     access_token_url = "{0}/o/token/".format(web_url)
     authorize_url = "{0}/o/authorize/".format(web_url)
-    profile_url = "{0}/eu/".format(api_url)
+    profile_url = "{0}/rh/eu/".format(api_url)
 
     def complete_login(self, request, app, token, **kwargs):
         headers = {"Authorization": "Bearer {}".format(token.token)}
