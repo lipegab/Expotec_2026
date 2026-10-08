@@ -1,0 +1,20 @@
+{% load static %}
+{% with ev=request.evento %}
+<footer class="ex-footer">
+  <div class="ex-sdg" aria-hidden="true"></div>
+  <div class="container">
+    <div>
+      <strong>{{ ev.edicao }} {{ ev.titulo|default:"Expotec" }}</strong>
+      {% if ev.subtitulo %}<small>{{ ev.subtitulo }}</small>{% endif %}
+    </div>
+    <div class="ex-footer__social">
+      {% if ev.instagram %}<a href="{{ ev.instagram }}" target="_blank" rel="noopener" aria-label="Instagram"><i class="fab fa-instagram" aria-hidden="true"></i></a>{% endif %}
+      {% if ev.youtube %}<a href="{{ ev.youtube }}" target="_blank" rel="noopener" aria-label="YouTube"><i class="fab fa-youtube" aria-hidden="true"></i></a>{% endif %}
+    </div>
+    <div class="ex-footer__legal">
+      &copy; Instituto Federal do Rio Grande do Norte (IFRN) &ndash; Campus São Paulo do Potengi.
+      <a href="https://www.google.com.br/maps/place/IFRN+-+Campus+S%C3%A3o+Paulo+do+Potengi/@-5.8952253,-35.7548359,17z" target="_blank" rel="noopener">Ver no mapa</a>
+    </div>
+  </div>
+</footer>
+{% endwith %}

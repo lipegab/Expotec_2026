@@ -1,0 +1,21 @@
+{# Campo de formulário das telas de autenticação: rótulo visível, erro e ajuda #}
+<div class="ex-field">
+  {% if field.field.widget.input_type == 'checkbox' %}
+    <div class="form-check">
+      {{ field }}
+      <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+    </div>
+  {% else %}
+    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+    {% if field.field.widget.input_type == 'password' %}
+      <div class="ex-pw">
+        {{ field }}
+        <button type="button" aria-label="Mostrar senha"><i class="fas fa-eye" aria-hidden="true"></i></button>
+      </div>
+    {% else %}
+      {{ field }}
+    {% endif %}
+  {% endif %}
+  {% if field.help_text and not hide_help %}<div class="ex-help">{{ field.help_text|safe }}</div>{% endif %}
+  {% for error in field.errors %}<span class="ex-err" role="alert">{{ error }}</span>{% endfor %}
+</div>

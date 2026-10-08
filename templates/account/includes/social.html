@@ -1,0 +1,10 @@
+{% load allauth socialaccount %}
+{# Botão de login por provedor externo (SUAP). Mostra "ou" apenas se houver provedor. #}
+{% if SOCIALACCOUNT_ENABLED %}
+  {% get_providers as socialaccount_providers %}
+  {% for provider in socialaccount_providers %}
+    {% provider_login_url provider process=process scope=scope auth_params=auth_params as href %}
+    <a href="{{ href }}" class="btn-suap"><i class="fas fa-university" aria-hidden="true"></i> Entrar com o {{ provider.name }}</a>
+  {% endfor %}
+  {% if socialaccount_providers %}<div class="ex-auth__sep"><span>ou use seu e-mail</span></div>{% endif %}
+{% endif %}

@@ -1,0 +1,253 @@
+{% extends 'public/layout.html' %}
+{% load static i18n custom_tags %}
+{% block title %} Início {% endblock title %}
+
+{% block content %}
+
+{# ===== Abertura ===== #}
+<header id="site-header" class="ex-hero">
+  <div class="container">
+    <div class="ex-hero__grid">
+      <div>
+        <p class="ex-hero__when">
+          <span><i class="far fa-calendar" aria-hidden="true"></i>
+            {% include "includes/periodo_evento.html" with ano=True %}
+          </span>
+          <span><i class="fas fa-location-dot" aria-hidden="true"></i> {{ evento.endereco.local|default:'IFRN' }}{% if evento.endereco.cidade %}, {{ evento.endereco.cidade }}{% endif %}</span>
+        </p>
+        <h1><span class="ex-ed">{{ evento.edicao|default:'4ª' }}</span> {{ evento.titulo|default:'Expotec' }}</h1>
+        {% if evento.subtitulo %}<p class="ex-hero__lede">{{ evento.subtitulo }}</p>{% endif %}
+        <div class="ex-hero__cta">
+          <a class="btn btn-primary btn-lg" href="{% url 'portal:evento-chamadas' %}">Submeter trabalho</a>
+          <a class="btn btn-outline-primary btn-lg" href="{% url 'portal:evento-atividades' %}">Ver programação</a>
+        </div>
+      </div>
+
+      <div class="ex-stage">
+        <div id="carousel_noticias" class="carousel slide h-100" data-bs-ride="carousel" aria-label="Destaques">
+          <div class="carousel-inner">
+            {% if evento.video_promocional %}
+            <div id="promo" class="carousel-item active">
+              <video id="promo_video" muted loop autoplay playsinline>
+                <source src="{{ evento.video_promocional.url }}" type="video/mp4">
+              </video>
+            </div>
+            {% endif %}
+            {% for n in evento.top5_noticias %}
+              <div class="carousel-item {% if forloop.first and not evento.video_promocional %}active{% endif %}">
+                {% if n.poster %}
+                  <img src="{{ n.poster.url }}" alt="" onerror="this.onerror=null;this.src='{% static 'img/placeholders/noticias.jpg' %}'">
+                {% else %}
+                  <img src="{% static 'img/placeholders/noticias.jpg' %}" alt="">
+                {% endif %}
+                <div class="carousel-caption d-block">
+                  <h2>{{ n.titulo }}</h2>
+                  <h1>{{ n.subtitulo }}</h1>
+                  <p>{{ n.texto }}</p>
+                  {% if n.url %}<a class="btn btn-white btn-sm" href="{{ n.url }}">Saiba mais</a>{% endif %}
+                </div>
+              </div>
+            {% empty %}
+              {% if not evento.video_promocional %}
+              <div class="carousel-item active">
+                <img src="{% static 'img/placeholders/noticias.jpg' %}" alt="">
+                <div class="carousel-caption d-block">
+                  <h2>{{ evento.dt_inicio|date:"j M Y" }} &ndash; {{ evento.endereco.local|default:'IFRN' }}</h2>
+                  <h1>{{ evento.edicao|default:'4ª' }} {{ evento.titulo|default:'Expotec' }}</h1>
+                </div>
+              </div>
+              {% endif %}
+            {% endfor %}
+          </div>
+          {% if evento.top5_noticias|length > 1 or evento.video_promocional %}
+          <button class="carousel-control-prev" type="button" data-bs-target="#carousel_noticias" data-bs-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Anterior</span>
+          </button>
+          <button class="carousel-control-next" type="button" data-bs-target="#carousel_noticias" data-bs-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="visually-hidden">Próximo</span>
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+{# ===== Sobre ===== #}
+<section id="about" class="section about">
+  <div class="container">
+    <h2 class="section-title">Sobre o evento</h2>
+    <div class="ex-about">
+      <div class="ex-about__text">{{ evento.apresentacao|default:"Apresentação do evento em breve."|safe }}</div>
+      <figure class="ex-about__fig">
+        {% if evento.imagem_promocional %}
+          <img src="{{ evento.imagem_promocional.url }}" alt="Imagem promocional do evento" onerror="this.onerror=null;this.src='{% static 'img/about-us.jpg' %}'">
+        {% else %}
+          <img src="{% static 'img/about-us.jpg' %}" alt="">
+        {% endif %}
+      </figure>
+    </div>
+  </div>
+</section>
+
+{% if evento.ItemGaleria.all %}
+<section id="gallery" class="section gallery pt-0">
+  <div class="container">
+    <div class="ex-gallery">
+      {% for j in evento.ItemGaleria.all %}
+      <a {% if j.url %}href="{{ j.url }}" target="_blank" rel="noopener"{% else %}href="javascript:void(0)" tabindex="-1"{% endif %}>
+        <img src="{{ j.img.url }}" alt="" loading="lazy" onerror="this.parentElement.style.display='none'">
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ===== Quando, onde, quanto ===== #}
+<section id="facts" class="ex-info" aria-label="Informações do evento">
+  <div class="container">
+    <dl>
+      <div>
+        <dt>Quando</dt>
+        <dd>{% include "includes/periodo_evento.html" %}<small>{{ evento.ano }}</small></dd>
+      </div>
+      <div>
+        <dt>Onde</dt>
+        <dd>{{ evento.endereco.local|default:'IFRN' }}<small>{{ evento.endereco.cidade|default:'São Paulo do Potengi' }}</small></dd>
+      </div>
+      <div>
+        <dt>Entrada</dt>
+        <dd>Livre<small>Para toda a comunidade</small></dd>
+      </div>
+      <div>
+        <dt>Áreas temáticas</dt>
+        <dd>{{ evento.areas_tematicas.all|length }}<small>para submissão de trabalhos</small></dd>
+      </div>
+    </dl>
+  </div>
+</section>
+
+{# ===== Áreas temáticas ===== #}
+<section id="areas" class="section">
+  <div class="container">
+    <h2 class="section-title">Áreas temáticas</h2>
+    {% if object.areas_tematicas.all %}
+    <div class="ex-areas">
+      {% for a in object.areas_tematicas.all %}
+      <a href="{% url 'portal:evento-area' a.pk %}" class="ex-area" style="--area-cor: {{ a.cor|default:'#0e6397' }};">
+        {% if a.icon %}<i class="fas {{ a.icon }}" aria-hidden="true"></i>{% endif %}
+        <i class="fas fa-arrow-right ex-area__go" aria-hidden="true"></i>
+        <h3>{{ a.nome }}</h3>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+      <p class="ex-empty">As áreas temáticas serão divulgadas em breve.</p>
+    {% endif %}
+  </div>
+</section>
+
+{# ===== Submissão ===== #}
+<section id="contribution" class="section ex-cta">
+  <div class="container">
+    <div>
+      <h2>Submeta seu trabalho na {{ evento.edicao }} {{ evento.titulo }}</h2>
+      <p>Compartilhe seus projetos e pesquisas com a comunidade. Veja as chamadas abertas, os prazos e as regras de cada modalidade.</p>
+    </div>
+    <div class="d-flex flex-wrap gap-2">
+      <a class="btn btn-sol btn-lg" href="{% url 'portal:evento-chamadas' %}">Ver chamadas</a>
+      {% if not request.user.is_authenticated %}
+      <a class="btn btn-white btn-lg" href="{% url 'account_login' %}">Acessar minha conta</a>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+{# ===== Parceiros ===== #}
+{% if evento.parceiros.all %}
+<section id="partner" class="section partner bg-papel">
+  <div class="container">
+    <h2 class="section-title">Parceiros</h2>
+    <div class="ex-partners">
+      {% for p in evento.parceiros.all %}
+      <a class="ex-partner" {% if p.url %}href="{{ p.url }}" target="_blank" rel="noopener"{% else %}href="javascript:void(0)" tabindex="-1"{% endif %}>
+        <img src="{{ p.logo.url }}" alt="{{ p.nome|default:'Parceiro' }}" loading="lazy" onerror="this.parentElement.style.display='none'">
+      </a>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{# ===== Localização ===== #}
+<section id="location" class="section location">
+  <div class="container">
+    <div class="ex-where">
+      <div>
+        <h2 class="section-title">Localização</h2>
+        <address>
+          <strong>{{ evento.endereco.local|default:'IFRN' }}</strong>
+          {{ evento.endereco.logradouro|default:'Av. Potengi' }}<br>
+          {{ evento.endereco.cidade|default:'São Paulo do Potengi' }}{% if evento.endereco.estado %} &ndash; {{ evento.endereco.estado }}{% else %} &ndash; RN{% endif %}
+        </address>
+        <div class="contact-info">
+          {% for c in evento.contatos.all %}
+            <div>
+              {{ c.nome }}
+              <div class="small">
+                {% if c.telefone and c.email %}{{ c.telefone }} &middot; {{ c.email }}
+                {% elif c.telefone %}{{ c.telefone }}
+                {% elif c.email %}{{ c.email }}{% endif %}
+              </div>
+            </div>
+          {% empty %}
+            <div class="small">(84) 4005-4112</div>
+          {% endfor %}
+        </div>
+      </div>
+      <div>
+        {% if evento and evento.endereco %}
+          <div id="map" role="img" aria-label="Mapa do local do evento"></div>
+        {% else %}
+          <div class="ex-empty d-flex align-items-center justify-content-center" style="min-height: 320px;">
+            A localização do evento ainda não foi configurada.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock content %}
+
+
+{% block extra_scripts %}
+    {{ block.super }}
+    {% if evento and evento.endereco %}
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAkg4j28B11Wqwrv9v3uGvwYXT8M-VHzYw&libraries=geometry&callback=initMap"></script>
+    {% endif %}
+    <script>
+        function initMap() {
+            {% if evento and evento.endereco %}
+            const mapEl = document.getElementById('map');
+            const map = new google.maps.Map(mapEl, { zoom: 17 });
+            const endereco = "{{ evento.endereco|escapejs }}".trim();
+            if (!endereco) {
+                mapEl.textContent = 'Endereço do evento não configurado.';
+                return;
+            }
+            new google.maps.Geocoder().geocode({ address: endereco }, function (results, status) {
+                if (status === 'OK') {
+                    const pos = results[0].geometry.location;
+                    map.setCenter(pos);
+                    new google.maps.Marker({ map: map, position: pos });
+                } else {
+                    mapEl.textContent = 'Não foi possível localizar o endereço do evento.';
+                }
+            });
+            {% endif %}
+        }
+    </script>
+{% endblock extra_scripts %}

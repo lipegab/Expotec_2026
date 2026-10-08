@@ -1,0 +1,9 @@
+{% load i18n static simple_menu %}
+{% generate_menu %}
+<ul class="navbar-nav ms-auto align-items-lg-center ex-nav__list">
+{% for item in menus.portal %}
+  <li class="nav-item">
+    <a href="{{ item.url }}" class="nav-link ex-nav__link{{ item.active|yesno:' is-active,' }}">{{ item.title }}</a>
+  </li>
+{% endfor %}
+</ul>

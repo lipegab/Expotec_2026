@@ -1,0 +1,30 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Sign In" %}{% endblock title %}
+
+{% block heading %}
+  <h2>Entrar</h2>
+  <p class="ex-auth__sub">Acesse sua área para se inscrever, submeter trabalhos e acompanhar suas atividades.</p>
+{% endblock heading %}
+
+{% block content %}
+  {% include "account/includes/social.html" %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}
+      <div class="ex-alert" role="alert">{{ error }}</div>
+    {% endfor %}
+    {% for field in form %}
+      {% include "account/includes/field.html" with hide_help=True %}
+    {% endfor %}
+    {{ redirect_field }}
+    <button type="submit" class="btn btn-primary btn-entrar">{% trans "Sign In" %}</button>
+  </form>
+
+  <div class="ex-auth__links">
+    <a href="{% url 'account_reset_password' %}">Esqueci minha senha</a>
+    <a href="{% url 'account_signup' %}">Criar conta</a>
+  </div>
+{% endblock content %}

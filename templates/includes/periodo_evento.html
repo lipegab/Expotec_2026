@@ -1,0 +1,2 @@
+{% comment %}Período do evento: "16 a 19 de dezembro", "30 de nov. a 2 de dezembro" ou "16 de dezembro".
+Use com ano=True para acrescentar "de 2024".{% endcomment %}{% with i=evento.dt_inicio f=evento.dt_encerramento %}{% if i == f %}{{ i|date:"j \d\e F"|lower }}{% elif i|date:"mY" == f|date:"mY" %}{{ i|date:"j" }} a {{ f|date:"j \d\e F"|lower }}{% else %}{{ i|date:"j \d\e F"|lower }} a {{ f|date:"j \d\e F"|lower }}{% endif %}{% if ano %} de {{ f|date:"Y" }}{% endif %}{% endwith %}

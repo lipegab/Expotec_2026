@@ -1,0 +1,4 @@
+# Dependências extras necessárias apenas em produção (DEBUG=False)
+-r requirements.txt
+mysqlclient
+django-redis

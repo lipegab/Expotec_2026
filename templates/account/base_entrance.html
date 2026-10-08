@@ -1,0 +1,93 @@
+{% load static i18n %}<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ request.evento.titulo }} | {% block title %}{% endblock title %}</title>
+
+  <link rel="stylesheet" href="{% static 'vendor/bootstrap5/css/bootstrap.min.css' %}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{% static 'css/tema.css' %}">
+
+  {% if request.evento.logo_mini %}
+  <link rel="icon" type="image/png" href="{{ request.evento.logo_mini.url }}">
+  {% endif %}
+
+  {% block extrastyle %}{% endblock extrastyle %}
+</head>
+
+<body class="{% block bodyclass %}ex-auth{% endblock bodyclass %}">
+  {% with ev=request.evento %}
+  <main class="ex-auth__grid">
+
+    <aside class="ex-auth__brand">
+      <a class="ex-auth__back" href="{% url 'portal:index' %}">
+        <i class="fas fa-arrow-left" aria-hidden="true"></i> Voltar ao portal
+      </a>
+
+      <div class="ex-auth__lede">
+        {% if ev %}
+          <p class="ex-ed">{{ ev.edicao }}</p>
+          <h1>{{ ev.titulo }}</h1>
+          {% if ev.subtitulo %}<p>{{ ev.subtitulo }}</p>{% endif %}
+        {% else %}
+          <h1>Expotec</h1>
+        {% endif %}
+      </div>
+
+      <div class="ex-auth__meta">
+        {% if ev %}
+          <span>
+            <strong>
+              {% if ev.dt_inicio == ev.dt_encerramento %}{{ ev.dt_inicio|date:"d/m/Y" }}
+              {% else %}{{ ev.dt_inicio|date:"d/m" }} a {{ ev.dt_encerramento|date:"d/m/Y" }}{% endif %}
+            </strong>
+          </span>
+          <span>{{ ev.endereco.local|default:"IFRN" }}{% if ev.endereco.cidade %}, {{ ev.endereco.cidade }}{% endif %}</span>
+        {% endif %}
+      </div>
+
+      <div class="ex-sdg" aria-hidden="true"></div>
+    </aside>
+
+    <section class="ex-auth__panel">
+      <div class="ex-auth__card">
+        <a href="{% url 'portal:index' %}" aria-label="Ir para o portal">
+          {% if ev.logo %}
+            <img class="ex-auth__logo" src="{{ ev.logo.url }}" alt="{{ ev.titulo }}"
+                 onerror="this.onerror=null;this.src='{% static 'img/logos/logo.png' %}'">
+          {% else %}
+            <img class="ex-auth__logo" src="{% static 'img/logos/logo.png' %}" alt="{{ ev.titulo|default:'Expotec' }}">
+          {% endif %}
+        </a>
+
+        {% block heading %}{% endblock heading %}
+
+        {% if messages %}
+          {% for message in messages %}
+            <div class="ex-alert" role="alert">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+
+        {% block content %}{% endblock content %}
+      </div>
+    </section>
+
+  </main>
+  {% endwith %}
+
+  <script>
+    // Mostrar/ocultar senha
+    document.querySelectorAll('.ex-pw button').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var input = btn.parentElement.querySelector('input');
+        var show = input.type === 'password';
+        input.type = show ? 'text' : 'password';
+        btn.setAttribute('aria-label', show ? 'Ocultar senha' : 'Mostrar senha');
+        btn.firstElementChild.className = show ? 'fas fa-eye-slash' : 'fas fa-eye';
+      });
+    });
+  </script>
+  {% block extra_scripts %}{% endblock extra_scripts %}
+</body>
+</html>

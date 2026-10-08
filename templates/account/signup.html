@@ -1,0 +1,29 @@
+{% extends "account/base_entrance.html" %}
+{% load i18n %}
+
+{% block title %}{% trans "Signup" %}{% endblock title %}
+
+{% block heading %}
+  <h2>Criar conta</h2>
+  <p class="ex-auth__sub">Cadastre-se para participar do evento. Quem tem SUAP pode entrar direto, sem cadastro.</p>
+{% endblock heading %}
+
+{% block content %}
+  {% include "account/includes/social.html" %}
+
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for error in form.non_field_errors %}
+      <div class="ex-alert" role="alert">{{ error }}</div>
+    {% endfor %}
+    {% for field in form %}
+      {% include "account/includes/field.html" %}
+    {% endfor %}
+    {{ redirect_field }}
+    <button type="submit" class="btn btn-primary btn-entrar">Criar conta</button>
+  </form>
+
+  <div class="ex-auth__links">
+    <span>Já tem conta? <a href="{% url 'account_login' %}">Entrar</a></span>
+  </div>
+{% endblock content %}
